@@ -2,8 +2,37 @@ html, body {
     font-family: sans-serif;
 }
 body {
-    height: 1500px;
+    height: 2000px;
     margin: 20px;
-    // font-size: 1.2rem;
+    font-size: 1.2rem;
     background-color: rgb(228, 228, 228);
+}
+
+.scrolling-up {
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 2em;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 56px;
+    cursor: pointer;
+    transition: .3s ease-out;
+    background: radial-gradient(#fff, #000 48px);
+    opacity: 0;
+    visibility: hidden;
+    &:hover{
+        box-shadow: 0px 0px 8px 1px #000000c4, inset 0px 0px 18px 0px #000000b9;
+    }
+}
+.scrolling-up_hide {
+    opacity: 0;
+    visibility: hidden;
+}
+.scrolling-up_show {
+    opacity: 1;
+    visibility: visible;
 }
