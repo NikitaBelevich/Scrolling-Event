@@ -3,6 +3,7 @@ html, body {
 }
 
 body {
+  height: 1500px;
   margin: 20px;
   background-color: #e4e4e4;
 }
