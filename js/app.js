@@ -1,63 +1,37 @@
 'use strict';
 
-const task2 = document.querySelector('.task2');
-
-class ScrollButton {
-    constructor() {
-        this.name = 'Scroll Buttom';
-    }
-    // Во всех методах прототипа возвращаем this, чтобы можно было-бы использовать цепочки вызовов
-    // Создаёт узел - кнопку и кладёт ссылку в одноимённое свойство
-    createButton(cssClass = 'scrolling-up') {
-        const buttonNode = document.createElement('div');
-        buttonNode.textContent = '^';
-        buttonNode.classList.add(cssClass);
-        this.buttonNode = buttonNode;
-        this.scrollingUp(); // Даём кнопке поведение: при клике прокручивать страницу вверх
-        return this;
-    }
-    // Вставляет кнопку - узел на страницу, по дефолту в body
-    insertButtonNode(parentNode = document.body) {
-        parentNode.append(this.buttonNode);
-        return this;
-    }
-    hideButton() {
-        if (this.buttonNode.classList.contains('scrolling-up_show')) {
-            this.buttonNode.classList.remove('scrolling-up_show');
+// Получаем картинки с классом
+const images = document.querySelectorAll('img.lazyload');
+// Задали настройки для нашего Observer
+const optionObserver = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.2 // параметр характеризующий при каком проценте видимости целевого элемента сработает callback
+};
+// Создали экземпляр
+let observer = new IntersectionObserver(lazyloadIMG, optionObserver);
+// Даём для observer все изображения для наблюдения
+images.forEach(img => {observer.observe(img);});
+// callback который будет вызываться при пересечении элемента с областью видимости
+function lazyloadIMG(images) {
+    images.forEach(img => {
+        // Здесь img это IntersectionObserverEntry
+        if (img.isIntersecting) { // если элемент был пересечён viewport на 10%, т.е появился
+            const targetImg = img.target;
+            loadImage(targetImg);
         }
-        this.buttonNode.classList.add('scrolling-up_hide');
-        return this;
-    }
-    showButton() {
-        if (this.buttonNode.classList.contains('scrolling-up_hide')) {
-            this.buttonNode.classList.remove('scrolling-up_hide');
-        }
-        this.buttonNode.classList.add('scrolling-up_show');
-        return this;
-    }
-    // Вешает на кнопку событие клика, при котором страница прокрутится вверх
-    scrollingUp() {
-        this.buttonNode.onmousedown = () => false; // Отмена выделения текста в кнопке
-        this.buttonNode.addEventListener('click', () => {
-            document.documentElement.scrollIntoView({block: "start", behavior: "smooth"});
-        });
-        return this;
-    }
+    });
 }
 
-// Создали объект кнопки и вставили её в html
-const button1 = new ScrollButton();
-button1.createButton().insertButtonNode(task2);
-
-const clientHeightWindow = document.documentElement.clientHeight;
-window.addEventListener('scroll', (e) => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll >= 300) { // 300 это высота в пикселях, прокрутив которую появится кнопка, можно регулировать этот параметр
-        button1.showButton();
-    } else {
-        button1.hideButton();
-    }
-    console.log(currentScroll, clientHeightWindow);
-});
-
+function loadImage(img) {
+    img.src = img.dataset.src; // отправили запрос на получение картинки
+    img.addEventListener('load', () => {
+        // console.log('load');
+        // Как только картинка загрузилась, мы даём ей класс для проявления, с нужной анимацией, т.е если она будет до этого момента не загружена, то анимация стработает сразу, причём даже на наполовине обрезанной загружающейся картинке.
+        img.classList.add('lazyload_show'); // добавили класс проявления картинки
+        // img.classList.remove('lazyload'); // удаляем класс
+    });
+    
+    //! Говорим Observer прекратить наблюдение за целевой уже загруженной картинкой
+    observer.unobserve(img);
+}
